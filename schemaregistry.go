@@ -465,8 +465,10 @@ type (
 
 	// Config describes a subject or globa schema-registry configuration
 	Config struct {
-		// CompatibilityLevel mode of subject or global
+		// CompatibilityLevel mode of subject or global - older version
 		CompatibilityLevel string `json:"compatibilityLevel"`
+		// Compatibility mode of subject or global
+		Compatibility string `json:"compatibility"`
 	}
 )
 
@@ -625,7 +627,7 @@ func (c *Client) getConfigSubject(subject string) (Config, error) {
 func (c *Client) setConfigSubject(subject, level string) error {
 	var err error
 	var config = Config{
-		CompatibilityLevel: level,
+		Compatibility: level,
 	}
 	send, err := json.Marshal(config)
 	if err != nil {
