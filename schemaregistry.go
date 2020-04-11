@@ -1,4 +1,3 @@
-// Package schemaregistry provides a client for Confluent's Kafka Schema Registry REST API.
 package schemaregistry
 
 import (
@@ -621,10 +620,38 @@ func (c *Client) getConfigSubject(subject string) (Config, error) {
 	return config, err
 }
 
+// setConfigSubject sets the Config of global or for a given subject. It handles 404 error in a
+// different way, since not-found for a subject configuration means it's using global.
+func (c *Client) setConfigSubject(subject, level string) error {
+	var err error
+	var config = Config{
+		CompatibilityLevel: level,
+	}
+	send, err := json.Marshal(config)
+	if err != nil {
+		return err
+	}
+	path := fmt.Sprintf("/config/%s", subject)
+	resp, respErr := c.do(http.MethodPut, path, "", send)
+	if respErr != nil && respErr.(ResourceError).ErrorCode != 404 {
+		return respErr
+	}
+	if resp != nil {
+		err = c.readJSON(resp, &config)
+	}
+	return err
+}
+
 // GetConfig returns the configuration (Config type) for global Schema-Registry or a specific
 // subject. When Config returned has "compatibilityLevel" empty, it's using global settings.
 func (c *Client) GetConfig(subject string) (Config, error) {
 	return c.getConfigSubject(subject)
+}
+
+// SetConfig sets the configuration (Config type) for global Schema-Registry or a specific
+// subject. When Config returned has "compatibilityLevel" empty, it's using global settings.
+func (c *Client) SetConfig(subject, level string) error {
+	return c.setConfigSubject(subject, level)
 }
 
 // subject (string) – Name of the subject
