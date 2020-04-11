@@ -466,9 +466,9 @@ type (
 	// Config describes a subject or globa schema-registry configuration
 	Config struct {
 		// CompatibilityLevel mode of subject or global - older version
-		CompatibilityLevel string `json:"compatibilityLevel"`
+		CompatibilityLevel string `json:"compatibilityLevel,omitempty"`
 		// Compatibility mode of subject or global
-		Compatibility string `json:"compatibility"`
+		Compatibility string `json:"compatibility,omitempty"`
 	}
 )
 
